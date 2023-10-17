@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum Category {
+  todo
+  doing
+  done
+}
+
+model User {
+  id    String @id @unique
+  email String @unique
+
+  firstname    String?
+  lastname     String?
+  picturelink  String?    @unique
+  colorSchema  String     @default("default")
+  Works_on     Works_on[]
+  taskCreated  Task[]     @relation("created")
+  taskModified Task[]     @relation("modified")
+}
+
+model Project {
+  id       String @id @unique
+  name     String @unique
+  leaderId String @unique
+  Tasks    Task[]
+
+  messages Message[]
+  Works_on Works_on[]
+}
+
+model Task {
+  id               Int      @id @unique @default(autoincrement())
+  title            String
+  description      String   @db.LongText
+  lastModifiedDate DateTime
+  category         Category
+  createdBy        User     @relation("created", fields: [createdId], references: [id])
+  createdId        String   @unique
+  lastModifiedBy   User     @relation("modified", fields: [lastModifiedId], references: [id])
+  lastModifiedId   String   @unique
+  Project          Project? @relation(fields: [projectId], references: [id])
+  projectId        String?
+
+  @@index([projectId])
+}
+
+model Works_on {
+  id        Int     @id @unique @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+model Message {
+  id        String   @id @unique
+  date      DateTime
+  content   String   @db.MediumText
+  senderId  String
+  Project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+
+  reaction    Reactions @relation(fields: [reactionsId], references: [id])
+  reactionsId Int       @unique
+
+  @@index([projectId])
+  @@index([reactionsId])
+}
+
+model Reactions {
+  id      Int       @unique @default(autoincrement())
+  like    Int       @default(0)
+  heart   Int       @default(0)
+  eyes    Int       @default(0)
+  dislike Int       @default(0)
+  Message Message[]
+}
