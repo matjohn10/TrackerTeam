@@ -19,7 +19,9 @@ const Page = () => {
         router.push("/api/auth/register");
       }
     }
-    if (data?.success) router.push(origin ? `/${origin}` : "/dashboard");
+    if (data?.success) {
+      router.push(origin ? `/${origin}` : "/dashboard");
+    }
   }, [isLoading]);
 
   return (

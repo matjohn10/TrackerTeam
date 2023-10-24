@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Roboto_Slab } from "next/font/google";
 import Header from "@/components/Header";
 import Providers from "@/components/Providers";
+import AblyProviders from "@/components/AblyProviders";
 
 const inter = Roboto_Slab({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
       <Providers>
         <body className={inter.className}>
           <Header />
+          <AblyProviders />
           {children}
         </body>
       </Providers>
