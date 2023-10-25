@@ -9,7 +9,7 @@ export default function CreateProject() {
   if (!user || !user.id) redirect("/auth-callback?origin=create-project");
 
   return (
-    <WidthWrapper className="mt-8">
+    <WidthWrapper className="my-8 ">
       <div className="flex justify-center w-full">
         <div className="flex flex-col gap-4 justify-center items-center w-full">
           <div className="flex flex-col gap-5 items-center">
@@ -24,7 +24,7 @@ export default function CreateProject() {
           <div className="flex items-end h-16 w-full">
             <div className="w-full border border-b-slate-200" />
           </div>
-          <ProjectCreator />
+          <ProjectCreator user={user} />
         </div>
       </div>
     </WidthWrapper>

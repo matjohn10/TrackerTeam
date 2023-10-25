@@ -21,9 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <Providers>
         <body className={inter.className}>
-          <Header />
-          <AblyProviders />
-          {children}
+          <AblyProviders>
+            <Header />
+            {children}
+          </AblyProviders>
         </body>
       </Providers>
     </html>

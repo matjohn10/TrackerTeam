@@ -45,7 +45,7 @@ model Task {
   title            String
   description      String   @db.LongText
   lastModifiedDate DateTime
-  category         Category
+  category         String
   createdBy        User     @relation("created", fields: [createdId], references: [id])
   createdId        String   @unique
   lastModifiedBy   User     @relation("modified", fields: [lastModifiedId], references: [id])
