@@ -23,40 +23,42 @@ model User {
 
   firstname    String?
   lastname     String?
-  picturelink  String?    @unique
-  colorSchema  String     @default("default")
-  Works_on     Works_on[]
-  taskCreated  Task[]     @relation("created")
-  taskModified Task[]     @relation("modified")
+  picturelink  String?   @unique
+  colorSchema  String    @default("default")
+  WorksOn      WorksOn[]
+  taskCreated  Task[]    @relation("created")
+  taskModified Task[]    @relation("modified")
 }
 
 model Project {
   id       String @id @unique
   name     String @unique
-  leaderId String @unique
+  leaderId String
   Tasks    Task[]
 
   messages Message[]
-  Works_on Works_on[]
+  WorksOn  WorksOn[]
 }
 
 model Task {
   id               Int      @id @unique @default(autoincrement())
   title            String
   description      String   @db.LongText
-  lastModifiedDate DateTime
+  lastModifiedDate DateTime @default(now())
   category         String
   createdBy        User     @relation("created", fields: [createdId], references: [id])
-  createdId        String   @unique
+  createdId        String
   lastModifiedBy   User     @relation("modified", fields: [lastModifiedId], references: [id])
-  lastModifiedId   String   @unique
+  lastModifiedId   String
   Project          Project? @relation(fields: [projectId], references: [id])
   projectId        String?
 
   @@index([projectId])
+  @@index([createdId])
+  @@index([lastModifiedId])
 }
 
-model Works_on {
+model WorksOn {
   id        Int     @id @unique @default(autoincrement())
   user      User    @relation(fields: [userId], references: [id])
   userId    String
@@ -76,7 +78,7 @@ model Message {
   projectId String?
 
   reaction    Reactions @relation(fields: [reactionsId], references: [id])
-  reactionsId Int       @unique
+  reactionsId Int
 
   @@index([projectId])
   @@index([reactionsId])

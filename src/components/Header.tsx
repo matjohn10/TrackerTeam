@@ -8,7 +8,6 @@ import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { cn } from "@/lib/utils";
 
 const Header = async () => {
   const { getUser } = getKindeServerSession();

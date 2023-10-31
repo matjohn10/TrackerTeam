@@ -1,6 +1,9 @@
+"use client";
+
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 interface InputProps {
   name: string;
@@ -9,6 +12,8 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   buttonTitle: string;
   onClick: () => void;
+  isShown?: boolean;
+  setIsShown?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function InputWithButton({
@@ -18,7 +23,10 @@ export function InputWithButton({
   onChange,
   buttonTitle,
   onClick,
+  isShown,
+  setIsShown,
 }: InputProps) {
+  const { toast } = useToast();
   return (
     <div className="grid w-full max-w-sm items-center gap-1.5">
       <Label htmlFor={name}>{name[0].toUpperCase() + name.slice(1)}</Label>
@@ -30,7 +38,22 @@ export function InputWithButton({
           value={value}
           onChange={onChange}
         />
-        <Button variant="ghost" onClick={onClick}>
+        <Button
+          disabled={value.length == 0}
+          variant="ghost"
+          onClick={() => {
+            onClick();
+            !isShown
+              ? toast({
+                  variant: "destructive",
+                  title: "Important!!",
+                  description:
+                    "If the email is already registered, the member will be automatically added. Otherwise, an email will be sent with a link.",
+                })
+              : void 0;
+            setIsShown ? setIsShown(true) : void 0;
+          }}
+        >
           {buttonTitle}
         </Button>
       </div>

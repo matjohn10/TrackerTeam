@@ -26,7 +26,7 @@ export default function Home() {
           variant="default"
           className="p-3 text-lg min-w-min lg:p-3 lg:px-6"
         >
-          <Link href="/dashboard">
+          <Link href="/api/auth/register">
             Start Now <BookOpenCheck className="ml-3 text-gray-100 h-5 w-5" />
           </Link>
         </Button>

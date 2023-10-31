@@ -16,6 +16,8 @@ interface TaskFormProps {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   setCategory: React.Dispatch<React.SetStateAction<string>>;
+  isOptional: boolean;
+  isFirst: boolean;
 }
 
 const TaskForm = ({
@@ -24,6 +26,8 @@ const TaskForm = ({
   setTitle,
   setDescription,
   setCategory,
+  isOptional,
+  isFirst,
 }: TaskFormProps) => {
   const statuses = [
     {
@@ -61,8 +65,8 @@ const TaskForm = ({
 
   return (
     <div className="flex flex-col items-center w-full h-full lg:w-6/12 animate-appear-text">
-      <h5 className="text-xl">Add your first task</h5>
-      <p className="text-xs text-[#ff5416]">Optional</p>
+      {isFirst ? <h5 className="text-xl">Add your first task</h5> : <></>}
+      {isOptional ? <p className="text-xs text-[#ff5416]">Optional</p> : <></>}
       <div className="flex flex-col items-center w-full gap-4 mt-12">
         <InputWithLabel
           name="title"

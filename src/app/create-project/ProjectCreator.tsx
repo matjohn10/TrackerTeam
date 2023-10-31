@@ -20,6 +20,10 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const mutation = trpc.addProject.useMutation();
+  const addMembers = trpc.addProjectMembers.useMutation();
+
+  // If the message about emails is shown or not
+  const [isShown, setIsShown] = useState(false);
 
   const counter = () => {
     let count = 0;
@@ -30,7 +34,7 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
   };
   const checkTaskInputs = !(counter() == 3 || counter() == 0);
 
-  const handleProjectCreation = () => {
+  const handleProjectCreation = async () => {
     // create an id
     // sent project info to db using trpc
     const id = v4();
@@ -43,7 +47,8 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
       task = { title, description, category };
     }
 
-    mutation.mutate({ project, task });
+    await mutation.mutate({ project, task });
+    addMembers.mutate({ emails, projectId: id });
   };
   if (mutation.isSuccess)
     redirect(api.baseURL + "/dashboard/project?id=" + projectId);
@@ -62,10 +67,14 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
           setName={setName}
           setEmail={setEmail}
           setEmails={setEmails}
+          isShown={isShown}
+          setIsShown={setIsShown}
         />
         <TaskForm
           title={title}
           description={description}
+          isOptional={true}
+          isFirst={true}
           setTitle={setTitle}
           setDescription={setDescription}
           setCategory={setCategory}

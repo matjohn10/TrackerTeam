@@ -47,14 +47,20 @@ const ProjectCard = ({ project, tasks }: CardProps) => {
       <CardHeader>
         <CardTitle>{project.name}</CardTitle>
         <CardDescription className="flex justify-between items-center">
-          <TimeAgo timestamp={newestTaskUpdate[0].lastModifiedDate} />
+          {newestTaskUpdate[0] && (
+            <TimeAgo timestamp={newestTaskUpdate[0].lastModifiedDate} />
+          )}
           <MembersSmallPastilles members={data!} />
         </CardDescription>
       </CardHeader>
       <CardContent className="flex gap-2">
-        {/* <p>Card Content</p> */}
+        <h5 className="text-lg font-bold  mr-4">Tasks</h5>
         {lastTwoTasks}
-        <p className="text-lg ml-4 font-bold">.&nbsp;.&nbsp;.</p>
+        {newestTaskUpdate[0] ? (
+          <p className="text-lg ml-4 font-bold">.&nbsp;.&nbsp;.</p>
+        ) : (
+          <p className="text-md mt-2 font-semibold"> No tasks yet...</p>
+        )}
       </CardContent>
       <CardFooter className="justify-center">
         <Button

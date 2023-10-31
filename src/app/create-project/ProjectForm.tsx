@@ -12,6 +12,8 @@ interface ProjectFormProps {
   setEmail: React.Dispatch<React.SetStateAction<string>>;
   emails: string[];
   setEmails: React.Dispatch<React.SetStateAction<string[]>>;
+  isShown: boolean;
+  setIsShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ProjectForm = ({
@@ -21,6 +23,8 @@ const ProjectForm = ({
   setName,
   setEmail,
   setEmails,
+  isShown,
+  setIsShown,
 }: ProjectFormProps) => {
   const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) =>
     setName(e.currentTarget.value);
@@ -65,6 +69,8 @@ const ProjectForm = ({
           onChange={onChangeEmail}
           buttonTitle="Add"
           onClick={handleAddEmail}
+          isShown={isShown}
+          setIsShown={setIsShown}
         />
       </div>
       <div className="flex flex-col w-8/12 justify-center max-h-[10rem] overflow-scroll">

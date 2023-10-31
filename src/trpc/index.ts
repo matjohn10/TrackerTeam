@@ -38,7 +38,7 @@ export const appRouter = router({
     .input(z.object({ projectId: z.string() }))
     .query(async ({ input }) => {
       const { projectId } = input;
-      const members = await db.works_on.findMany({
+      const members = await db.worksOn.findMany({
         where: {
           projectId,
         },
@@ -50,7 +50,7 @@ export const appRouter = router({
     }),
   getProjects: privateProcedure.query(async ({ ctx }) => {
     const { userId } = ctx;
-    const projects = await db.works_on.findMany({
+    const projects = await db.worksOn.findMany({
       where: {
         userId,
       },
@@ -65,6 +65,26 @@ export const appRouter = router({
 
     return projects;
   }),
+  getProject: privateProcedure
+    .input(z.object({ projectId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const { projectId } = input;
+      const project = await db.worksOn.findFirst({
+        where: {
+          userId,
+          projectId,
+        },
+        include: {
+          project: {
+            include: {
+              Tasks: true,
+            },
+          },
+        },
+      });
+      return project;
+    }),
   addProject: privateProcedure
     .input(
       z.object({
@@ -90,8 +110,8 @@ export const appRouter = router({
         await db.project.create({
           data: {
             ...project,
-            Works_on: {
-              create: [{ userId }],
+            WorksOn: {
+              create: { userId },
             },
           },
         });
@@ -100,22 +120,69 @@ export const appRouter = router({
           data: {
             ...project,
             Tasks: {
-              create: [
-                {
-                  ...task,
-                  createdId: userId,
-                  lastModifiedDate: formatISO(new Date()),
-                  lastModifiedId: userId,
-                },
-              ],
+              create: {
+                ...task,
+                createdId: userId,
+                lastModifiedDate: formatISO(new Date()),
+                lastModifiedId: userId,
+              },
             },
-            Works_on: {
-              create: [{ userId }],
+            WorksOn: {
+              create: { userId: userId },
             },
           },
         });
       }
-      return { success: true };
+    }),
+  addProjectMembers: privateProcedure
+    .input(z.object({ emails: z.array(z.string()), projectId: z.string() }))
+    .mutation(async ({ input }) => {
+      let emailSent: boolean = false;
+      input.emails.forEach(async (email) => {
+        const user = await db.user.findFirst({
+          where: {
+            email: email,
+          },
+        });
+
+        if (!user) {
+          emailSent = true;
+          // send an email with link with project id hashed
+          console.log(email);
+        } else {
+          await db.worksOn.create({
+            data: {
+              projectId: input.projectId,
+              userId: user.id,
+            },
+          });
+        }
+      });
+      return { success: true, emailSent };
+    }),
+  addTask: privateProcedure
+    .input(
+      z.object({
+        task: z.object({
+          title: z.string(),
+          description: z.string(),
+          category: z.string(),
+        }),
+        project: z.object({ id: z.string() }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const { task, project } = input;
+
+      await db.task.create({
+        data: {
+          ...task,
+          createdId: userId,
+          lastModifiedId: userId,
+          projectId: project.id,
+        },
+      });
     }),
 });
 
