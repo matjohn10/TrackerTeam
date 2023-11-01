@@ -50,11 +50,6 @@ const TaskForm = ({
       label: "Done",
       icon: CheckCircle2,
     },
-    {
-      value: "canceled",
-      label: "Canceled",
-      icon: XCircle,
-    },
   ];
 
   const onChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) =>

@@ -22,7 +22,7 @@ interface Props {
   projectId: string;
   user: KindeUser;
 }
-type Task = {
+export type Task = {
   id?: number;
   projectId?: string | null;
   title: string;
@@ -74,10 +74,18 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
       setMessages((prev) => [event.data, ...prev]);
     } else if (event.name === "delete-task") {
       setTasks((prev) => prev?.filter((t) => t.id !== event.data.id));
+    } else if (event.name === "update-task") {
+      setTasks((prev) => {
+        if (!prev) {
+          return [event.data];
+        } else {
+          return [...prev.filter((t) => t.id !== event.data.id), event.data];
+        }
+      });
     } else {
       setTasks((prev) => (prev ? [...prev, event.data] : prev));
       const id = v4();
-      const content = `A new task was added to the ${event.data.category} manager.`;
+      const content = `A new task (${event.data.title}) was added to the task manager.`;
       addMessage.mutate({
         message: { id, content },
         projectId,
@@ -110,6 +118,7 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
   }, [data]);
   const addTask = trpc.addTask.useMutation();
   const deleteTask = trpc.deleteTask.useMutation();
+  const updatedTask = trpc.updateTask.useMutation();
 
   const handleDeleteTask = (id: number | undefined) => {
     if (id) {
@@ -118,33 +127,59 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
 
     channel.publish("delete-task", { id });
   };
+  const handleMovetask = (id: number | undefined, to: string, task: Task) => {
+    if (id) {
+      updatedTask.mutate({ id, categ: to });
+      task.category = to;
+      channel.publish("update-task", task);
+    }
+  };
+
   const todoTasks =
     tasks &&
-    tasks.map((task) =>
-      task.category == "Todo" ? (
-        <TaskCardB task={task} handleDeleteTask={handleDeleteTask} />
-      ) : (
-        <></>
-      )
-    );
+    tasks
+      .sort((a, b) => b.lastModifiedDate.localeCompare(a.lastModifiedDate))
+      .map((task) =>
+        task.category == "Todo" ? (
+          <TaskCardB
+            task={task}
+            handleDeleteTask={handleDeleteTask}
+            handleMovetask={handleMovetask}
+          />
+        ) : (
+          <></>
+        )
+      );
   const doingTasks =
     tasks &&
-    tasks.map((task) =>
-      task.category == "Doing" ? (
-        <TaskCardB task={task} handleDeleteTask={handleDeleteTask} />
-      ) : (
-        <></>
-      )
-    );
+    tasks
+      .sort((a, b) => b.lastModifiedDate.localeCompare(a.lastModifiedDate))
+      .map((task) =>
+        task.category == "Doing" ? (
+          <TaskCardB
+            task={task}
+            handleDeleteTask={handleDeleteTask}
+            handleMovetask={handleMovetask}
+          />
+        ) : (
+          <></>
+        )
+      );
   const doneTasks =
     tasks &&
-    tasks.map((task) =>
-      task.category == "Done" ? (
-        <TaskCardB task={task} handleDeleteTask={handleDeleteTask} />
-      ) : (
-        <></>
-      )
-    );
+    tasks
+      .sort((a, b) => b.lastModifiedDate.localeCompare(a.lastModifiedDate))
+      .map((task) =>
+        task.category == "Done" ? (
+          <TaskCardB
+            task={task}
+            handleDeleteTask={handleDeleteTask}
+            handleMovetask={handleMovetask}
+          />
+        ) : (
+          <></>
+        )
+      );
 
   const handleNewTask = () => {
     data &&

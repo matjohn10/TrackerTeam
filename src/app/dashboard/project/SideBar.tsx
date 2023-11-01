@@ -7,6 +7,25 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import Members from "./Members";
 import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/server";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { CustomDialog } from "@/components/CustomDialog";
+import { Button } from "@/components/ui/button";
+import BacklogTasks from "./BacklogTasks";
 
 interface Props {
   isOpen: boolean;
@@ -72,11 +91,49 @@ const SideBar = ({ isOpen, projectId, user }: Props) => {
             <Members projectId={projectId} user={user} />
           </div>
         </div>
-        <div className="flex flex-col gap-2 items-center w-full pl-4">
-          <div className="flex flex-col p-1  items-start w-full gap-4">
-            <p className="hover:underline hover:cursor-default">Backlog</p>
-            <p className="hover:underline hover:cursor-default">Canceled</p>
-          </div>
+
+        <div className="flex flex-col gap-2 items-start w-full pl-4">
+          <Dialog>
+            <TooltipProvider>
+              <Tooltip>
+                <DialogTrigger asChild>
+                  <TooltipTrigger>
+                    <div className="flex flex-col p-1 items-start w-full gap-4">
+                      <p className="hover:underline hover:cursor-default">
+                        Backlog
+                      </p>
+                    </div>
+                  </TooltipTrigger>
+                </DialogTrigger>
+                <TooltipContent>
+                  <p className="text-sm">Click to open</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <DialogContent className="sm:max-w-md h-fit max-h-[55%]">
+              <DialogHeader>
+                <DialogTitle>{"Backlog Tasks"}</DialogTitle>
+                <DialogDescription>
+                  {
+                    "Tasks can be move here to be saved instead of being deleted."
+                  }
+                </DialogDescription>
+              </DialogHeader>
+              <BacklogTasks projectId={projectId} />
+              <DialogFooter className="sm:justify-start">
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="hover:bg-[#ff5416] hover:text-white"
+                  >
+                    Close
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

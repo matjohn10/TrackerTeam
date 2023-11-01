@@ -180,6 +180,27 @@ export const appRouter = router({
       });
       return { success: true, emailSent };
     }),
+  getTasks: privateProcedure
+    .input(z.object({ projectId: z.string(), taskCat: z.string().nullable() }))
+    .query(async ({ input }) => {
+      const { projectId, taskCat } = input;
+      if (taskCat) {
+        const tasks = await db.task.findMany({
+          where: {
+            projectId,
+            category: taskCat,
+          },
+        });
+        return tasks;
+      } else {
+        const tasks = await db.task.findMany({
+          where: {
+            projectId,
+          },
+        });
+        return tasks;
+      }
+    }),
   addTask: privateProcedure
     .input(
       z.object({
@@ -213,6 +234,21 @@ export const appRouter = router({
           id,
         },
       });
+    }),
+  updateTask: privateProcedure
+    .input(z.object({ id: z.number(), categ: z.string() }))
+    .mutation(async ({ input }) => {
+      const { id, categ } = input;
+      const updatedTask = await db.task.update({
+        data: {
+          category: categ,
+          lastModifiedDate: new Date().toISOString(),
+        },
+        where: {
+          id,
+        },
+      });
+      return updatedTask;
     }),
   getMessages: privateProcedure
     .input(z.object({ projectId: z.string() }))

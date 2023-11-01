@@ -41,13 +41,6 @@ type Project = {
 
 const Projects = ({ user }: Props) => {
   const { data, isLoading } = trpc.getProjects.useQuery();
-  // const {} = useChannel("connected", (event: any) => {
-  //   console.log(typeof event.data.emails);
-  //   if (event.data.emails.includes(user.email)) {
-  //     console.log("here");
-  //     // make a notification maybe in the header since it is always on the screen
-  //   }
-  // });
 
   const displayProjects = () => {
     return data && data.length !== 0 ? (
