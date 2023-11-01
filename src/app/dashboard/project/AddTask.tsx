@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
+import { Types } from "ably/promises";
 
 interface Props {
   category: string;
   projectId: string | undefined;
   setTasks: (value: React.SetStateAction<Task[] | undefined>) => void;
+  channel: Types.RealtimeChannelPromise;
 }
 type Task = {
   id?: number;
@@ -24,7 +26,7 @@ type Task = {
   lastModifiedId?: string;
 };
 
-const AddTask = ({ setTasks, category, projectId }: Props) => {
+const AddTask = ({ setTasks, category, projectId, channel }: Props) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categ, setCateg] = useState("");
@@ -36,19 +38,28 @@ const AddTask = ({ setTasks, category, projectId }: Props) => {
         task: { title, description, category: categ },
         project: { id: projectId },
       });
-    setTasks((prev) =>
-      prev
-        ? [
-            ...prev,
-            {
-              title,
-              description,
-              category: categ,
-              lastModifiedDate: new Date().toISOString(),
-            },
-          ]
-        : prev
-    );
+    // setTasks((prev) =>
+    //   prev
+    //     ? [
+    //         ...prev,
+    //         {
+    //           title,
+    //           description,
+    //           category: categ,
+    //           lastModifiedDate: new Date().toISOString(),
+    //         },
+    //       ]
+    //     : prev
+    // );
+    channel.publish("new-task", {
+      title,
+      description,
+      category: categ,
+      lastModifiedDate: new Date().toISOString(),
+    });
+    setTitle("");
+    setDescription("");
+    setCateg("");
   };
 
   const trigger = (

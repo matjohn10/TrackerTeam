@@ -10,6 +10,7 @@ import { v4 } from "uuid";
 import { Loader2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import api from "@/lib/utils";
+import { useChannel } from "ably/react";
 
 const ProjectCreator = ({ user }: { user: KindeUser }) => {
   const [projectId, setProjectId] = useState("");
@@ -21,6 +22,7 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
   const [category, setCategory] = useState("");
   const mutation = trpc.addProject.useMutation();
   const addMembers = trpc.addProjectMembers.useMutation();
+  const { channel } = useChannel("connected");
 
   // If the message about emails is shown or not
   const [isShown, setIsShown] = useState(false);
@@ -50,8 +52,13 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
     await mutation.mutate({ project, task });
     addMembers.mutate({ emails, projectId: id });
   };
-  if (mutation.isSuccess)
+  if (mutation.isSuccess) {
+    channel.publish("send-project", {
+      emails,
+      message: `You were added to a new project called ${name}.`,
+    });
     redirect(api.baseURL + "/dashboard/project?id=" + projectId);
+  }
   if (mutation.isError) {
     // create a popup to mention error and to try again
     console.log(mutation.error);

@@ -21,11 +21,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Providers>
-        <body className={inter.className}>
-          <Header />
-          {children}
-          <Toaster />
-        </body>
+        <AblyProviders>
+          <body className={inter.className}>
+            <Header />
+            {children}
+            <Toaster />
+          </body>
+        </AblyProviders>
       </Providers>
     </html>
   );

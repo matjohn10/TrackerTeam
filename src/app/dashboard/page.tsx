@@ -4,6 +4,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 import Projects from "./Projects";
 import AddCard from "./AddCard";
+import Testing from "./Testing";
 
 const Dashboard = async () => {
   const { getUser } = getKindeServerSession();
@@ -24,13 +25,14 @@ const Dashboard = async () => {
         <p className="text-xl text-center">
           Where you overview all your current projects!
         </p>
+        {/* <Testing /> */}
         <div className="flex justify-center md:justify-start items-center w-full">
           <h3 className="text-3xl font-semibold mt-8">Projects</h3>
         </div>
       </div>
       <div className="flex w-10/12 h-full justify-center items-center p-2 mt-8 mx-12">
         <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 ">
-          <Projects />
+          <Projects user={user} />
           <AddCard content="Don't lose track!" />
         </div>
       </div>

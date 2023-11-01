@@ -11,10 +11,16 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/app/_trpc/client";
+import { useChannel } from "ably/react";
+import { v4 } from "uuid";
+import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/server";
+import Messages from "./Messages";
+import ShareInput from "./ShareInput";
 
 interface Props {
   isOpen: boolean;
   projectId: string;
+  user: KindeUser;
 }
 type Task = {
   id?: number;
@@ -25,16 +31,74 @@ type Task = {
   lastModifiedDate: string;
   createdId?: string;
   lastModifiedId?: string;
+  senderId?: string;
 };
 
-const TaskDashboard = ({ projectId, isOpen }: Props) => {
+export type Message = {
+  id: string;
+  projectId?: string;
+  content: string;
+  date: string;
+  senderFN?: string;
+  senderLN?: string;
+  like: number;
+  heart: number;
+  eyes: number;
+  dislike: number;
+  senderId: string;
+  User?: {
+    firstname: string | null;
+    lastname: string | null;
+    colorSchema: string;
+  };
+};
+
+const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categ, setCateg] = useState("");
   const [tasks, setTasks] = useState<Task[] | undefined>();
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const addMessage = trpc.addMessage.useMutation();
+
+  const [email, setEmail] = useState("");
+
+  const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setEmail(e.currentTarget.value);
+
+  const { channel } = useChannel(`task-added:${projectId}`, (event: any) => {
+    // channel that updates the task manager in real time for every user
+    console.log(event.data);
+    setTasks((prev) => (prev ? [...prev, event.data] : prev));
+    const id = v4();
+    const content = `A new task was added to the ${event.data.category} manager.`;
+    addMessage.mutate({
+      message: { id, content },
+      projectId,
+      senderId: user.id!,
+    });
+    setMessages((prev) => [
+      {
+        id,
+        content,
+        date: new Date().toISOString(),
+        senderFN: user.given_name || "",
+        senderLN: user.family_name || "",
+        senderId: user.id || "",
+        like: 0,
+        heart: 0,
+        eyes: 0,
+        dislike: 0,
+      },
+      ...prev,
+    ]);
+  });
+
   const { data, isLoading } = trpc.getProject.useQuery({
     projectId: projectId,
   });
+
   useEffect(() => {
     setTasks(data?.project.Tasks);
   }, [data]);
@@ -61,19 +125,15 @@ const TaskDashboard = ({ projectId, isOpen }: Props) => {
         task: { title, description, category: categ },
         project: { id: data.projectId },
       });
-    setTasks((prev) =>
-      prev
-        ? [
-            ...prev,
-            {
-              title,
-              description,
-              category: categ,
-              lastModifiedDate: new Date().toISOString(),
-            },
-          ]
-        : prev
-    );
+    channel.publish("new-task", {
+      title,
+      description,
+      category: categ,
+      lastModifiedDate: new Date().toISOString(),
+    });
+    setTitle("");
+    setDescription("");
+    setCateg("");
   };
 
   const dialogContent = (
@@ -127,12 +187,47 @@ const TaskDashboard = ({ projectId, isOpen }: Props) => {
               additionalClose={dialogAddBtn}
               contentChildren={dialogContent}
             />
-            <div className="flex items-center hover:underline hover:cursor-default">
-              Share &nbsp; <Share className="w-4 h-4" />
-            </div>
-            <div className="flex items-center hover:underline hover:cursor-default">
-              Comments &nbsp; <MessageSquare className="w-4 h-4" />
-            </div>
+
+            <CustomDialog
+              child={
+                <div className="flex items-center hover:underline hover:cursor-default">
+                  Share &nbsp; <Share className="w-4 h-4" />
+                </div>
+              }
+              title="Share your project"
+              description={"Add a new member"}
+              additionalClose={<></>}
+              contentChildren={
+                <ShareInput
+                  name="Email"
+                  placeholder="Enter email..."
+                  buttonTitle="Send"
+                  value={email}
+                  onChange={onChangeEmail}
+                  setEmail={setEmail}
+                  projectId={projectId}
+                  projectName={data?.project.name}
+                />
+              }
+            />
+            <CustomDialog
+              child={
+                <div className="flex items-center hover:underline hover:cursor-default">
+                  Comments &nbsp; <MessageSquare className="w-4 h-4" />
+                </div>
+              }
+              title={data?.project.name + " Messages" || "Project Messages"}
+              description=""
+              additionalClose={<></>}
+              contentChildren={
+                <Messages
+                  projectId={projectId}
+                  messages={messages}
+                  setMessages={setMessages}
+                  user={user}
+                />
+              }
+            />
           </div>
         </div>
         <br />
@@ -152,6 +247,7 @@ const TaskDashboard = ({ projectId, isOpen }: Props) => {
             setTasks={setTasks}
             category="Todo"
             projectId={data?.projectId}
+            channel={channel}
           />
         </div>
         <div className="flex flex-col w-full items-center" key="Doing">
@@ -167,6 +263,7 @@ const TaskDashboard = ({ projectId, isOpen }: Props) => {
             setTasks={setTasks}
             category="Doing"
             projectId={data?.projectId}
+            channel={channel}
           />
         </div>
         <div className="flex flex-col w-full items-center" key="Done">
@@ -182,6 +279,7 @@ const TaskDashboard = ({ projectId, isOpen }: Props) => {
             setTasks={setTasks}
             category="Done"
             projectId={data?.projectId}
+            channel={channel}
           />
         </div>
       </div>

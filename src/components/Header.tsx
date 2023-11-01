@@ -8,6 +8,7 @@ import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import Notifications from "./Notifications";
 
 const Header = async () => {
   const { getUser } = getKindeServerSession();
@@ -21,8 +22,9 @@ const Header = async () => {
   return (
     <nav className="flex sticky top-0 w-full z-20 bg-inherit border-b border-neutral-200 border-solid">
       <WidthWrapper>
-        <div className="flex sticky top-0 w-full h-15 p-5 justify-between items-center">
-          <div>
+        <div className="flex sticky top-0 w-full h-15 p-5 justify-between items-center z-30">
+          <div className="relative">
+            {user && <Notifications user={user} />}
             <Link href="/">
               <Image
                 className="w-8 h-8"

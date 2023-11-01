@@ -31,7 +31,7 @@ export function CustomDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{child}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md h-fit max-h-[55%]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

@@ -18,7 +18,7 @@ interface Props {
 
 const TaskCardB = ({ task }: Props) => {
   return (
-    <div className="flex flex-col min-w-[255px] max-w-[375px] shadow-[0_0_5px_2px_rgba(112,112,112,.6)] rounded-md p-2 w-full">
+    <div className="flex flex-col min-w-[220px] max-w-[375px] shadow-[0_0_5px_2px_rgba(112,112,112,.6)] rounded-md p-2 w-full">
       <div className="flex items-center justify-start gap-4">
         {task.category === "Todo" ? (
           <Circle className="w-4 h-4 hover:text-[#ff5416be] hover:cursor-pointer" />

@@ -14,7 +14,7 @@ const ProjectPage = async () => {
     },
   });
   if (!dbUser) redirect("/auth-callback?origin=dashboard");
-  return <ProjectPageRender />;
+  return <ProjectPageRender user={user} />;
 };
 
 export default ProjectPage;

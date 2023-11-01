@@ -134,6 +134,26 @@ export const appRouter = router({
         });
       }
     }),
+  getMembers: privateProcedure
+    .input(z.object({ ids: z.array(z.string()), projectId: z.string() }))
+    .query(async ({ input }) => {
+      const { ids, projectId } = input;
+
+      const members = await db.worksOn.findMany({
+        where: {
+          projectId,
+        },
+        include: {
+          user: {
+            select: {
+              firstname: true,
+              lastname: true,
+            },
+          },
+        },
+      });
+      return members;
+    }),
   addProjectMembers: privateProcedure
     .input(z.object({ emails: z.array(z.string()), projectId: z.string() }))
     .mutation(async ({ input }) => {
@@ -184,6 +204,86 @@ export const appRouter = router({
         },
       });
     }),
+  getMessages: privateProcedure
+    .input(z.object({ projectId: z.string() }))
+    .query(async ({ input }) => {
+      const { projectId } = input;
+      const messages = await db.message.findMany({
+        where: {
+          projectId,
+        },
+        include: {
+          User: {
+            select: {
+              firstname: true,
+              lastname: true,
+              colorSchema: true,
+            },
+          },
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
+      return messages;
+    }),
+  addMessage: privateProcedure
+    .input(
+      z.object({
+        message: z.object({
+          id: z.string(),
+          content: z.string(),
+        }),
+        projectId: z.string(),
+        senderId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const { message, projectId, senderId } = input;
+      console.log(senderId);
+      if (userId === senderId) {
+        await db.message.create({
+          data: {
+            ...message,
+            senderId: senderId,
+            projectId,
+          },
+        });
+      }
+    }),
+  getNotifications: privateProcedure.query(async ({ ctx }) => {
+    const { userId } = ctx;
+    const notifs = await db.notification.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        message: true,
+      },
+    });
+    return notifs;
+  }),
+  addNotification: privateProcedure
+    .input(z.object({ message: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const { message } = input;
+      await db.notification.create({
+        data: {
+          userId,
+          message,
+        },
+      });
+    }),
+  deleteNotifications: privateProcedure.mutation(async ({ ctx }) => {
+    const { userId } = ctx;
+    await db.notification.deleteMany({
+      where: {
+        userId,
+      },
+    });
+  }),
 });
 
 export type AppRouter = typeof appRouter;

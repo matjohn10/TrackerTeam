@@ -5,13 +5,16 @@ import { ArrowUpRightSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import Members from "./Members";
+import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/server";
 
 interface Props {
   isOpen: boolean;
   projectId: string;
+  user: KindeUser;
 }
 
-const SideBar = ({ isOpen, projectId }: Props) => {
+const SideBar = ({ isOpen, projectId, user }: Props) => {
   const router = useRouter();
   const sideClass = isOpen ? "flex h-full sticky top-0 w-2/12 p-2" : "hidden";
   const { data, isLoading } = trpc.getProjects.useQuery();
@@ -19,7 +22,7 @@ const SideBar = ({ isOpen, projectId }: Props) => {
     data &&
     data.map((project) => (
       <div
-        className="flex justify-between items-center p-1 w-6/12 rounded-sm hover:bg-gray-100 hover:cursor-pointer"
+        className="flex justify-between items-center p-1 w-full rounded-sm hover:bg-gray-100 hover:cursor-pointer"
         onClick={() =>
           router.push("/dashboard/project?id=" + project.projectId)
         }
@@ -36,8 +39,8 @@ const SideBar = ({ isOpen, projectId }: Props) => {
         <ArrowUpRightSquare
           className={
             project.projectId == projectId
-              ? "font-semibold underline text-[#ff5416] h-5 w-5"
-              : "font-semibold h-5 w-5"
+              ? "hidden md:block font-semibold underline text-[#ff5416] h-5 w-5"
+              : "hidden md:block font-semibold h-5 w-5"
           }
         />
       </div>
@@ -63,10 +66,10 @@ const SideBar = ({ isOpen, projectId }: Props) => {
         </div>
         <div className="flex flex-col gap-2 items-center w-full pl-4">
           <div className="flex w-full justify-start">
-            <h2 className="font-semibold text-xl mt-10 mb-6">Members Status</h2>
+            <h2 className="font-semibold text-xl mt-10 mb-4">Members Status</h2>
           </div>
           <div className="flex flex-col p-1  items-start w-full gap-4">
-            None
+            <Members projectId={projectId} user={user} />
           </div>
         </div>
         <div className="flex flex-col gap-2 items-center w-full pl-4">

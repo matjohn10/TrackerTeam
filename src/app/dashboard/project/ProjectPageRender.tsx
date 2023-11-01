@@ -6,8 +6,9 @@ import { useState } from "react";
 import { AlignJustify } from "lucide-react";
 import TaskDashboard from "./TaskDashboard";
 import { Separator } from "@/components/ui/separator";
+import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/server";
 
-const ProjectPageRender = () => {
+const ProjectPageRender = ({ user }: { user: KindeUser }) => {
   const [isOpen, setIsOpen] = useState(true);
   const searchParams = useSearchParams();
   const projectId = searchParams.get("id") || "";
@@ -20,9 +21,9 @@ const ProjectPageRender = () => {
           onClick={() => setIsOpen((prev) => !prev)}
         />
       </div>
-      <SideBar isOpen={isOpen} projectId={projectId} />
+      <SideBar isOpen={isOpen} projectId={projectId} user={user} />
       <Separator orientation="vertical" />
-      <TaskDashboard isOpen={isOpen} projectId={projectId} />
+      <TaskDashboard isOpen={isOpen} projectId={projectId} user={user} />
     </div>
   );
 };
