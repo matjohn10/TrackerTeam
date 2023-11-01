@@ -55,7 +55,7 @@ export function ComboboxPopover({
             {selectedStatus ? (
               <>
                 <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
-                {selectedStatus.value}
+                {selectedStatus.label}
               </>
             ) : (
               <>{placeholder}</>
@@ -74,15 +74,14 @@ export function ComboboxPopover({
                   <CommandItem
                     key={status.value}
                     onSelect={(value) => {
-                      console.log(value);
                       setSelectedStatus(
                         comboboxElements.find(
-                          (priority) => priority.value.toLowerCase() === value
+                          (priority) => priority.value === value
                         ) || null
                       );
                       setSelectedElement(
                         comboboxElements.find(
-                          (priority) => priority.value.toLowerCase() === value
+                          (priority) => priority.value === value
                         )?.label || ""
                       );
                       setOpen(false);
@@ -96,7 +95,7 @@ export function ComboboxPopover({
                           : "opacity-40"
                       )}
                     />
-                    <span>{status.value}</span>
+                    <span>{status.label}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>

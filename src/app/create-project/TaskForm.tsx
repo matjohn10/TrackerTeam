@@ -31,22 +31,22 @@ const TaskForm = ({
 }: TaskFormProps) => {
   const statuses = [
     {
-      value: "Backlog",
+      value: "backlog",
       label: "Backlog",
       icon: HelpCircle,
     },
     {
-      value: "Upcoming",
+      value: "todo",
       label: "Todo",
       icon: Circle,
     },
     {
-      value: "Doing",
+      value: "doing",
       label: "Doing",
       icon: ArrowUpCircle,
     },
     {
-      value: "Completed",
+      value: "done",
       label: "Done",
       icon: CheckCircle2,
     },
