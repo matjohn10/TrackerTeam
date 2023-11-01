@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/server";
 import { InputWithButton } from "@/components/FormInputWithButton";
 import { useChannel } from "ably/react";
+import { Types } from "ably/promises";
 import { v4 } from "uuid";
 
 interface Props {
@@ -13,9 +14,16 @@ interface Props {
   projectId: string;
   setMessages: (value: React.SetStateAction<Message[]>) => void;
   user: KindeUser;
+  channel: Types.RealtimeChannelPromise;
 }
 
-const Messages = ({ messages, projectId, setMessages, user }: Props) => {
+const Messages = ({
+  messages,
+  projectId,
+  setMessages,
+  user,
+  channel,
+}: Props) => {
   const { data } = trpc.getMessages.useQuery({ projectId });
   const msgRender =
     data &&
@@ -53,21 +61,33 @@ const Messages = ({ messages, projectId, setMessages, user }: Props) => {
       projectId,
       senderId: user.id!,
     });
-    setMessages((prev) => [
-      {
-        id,
-        content: message,
-        date: new Date().toISOString(),
-        senderFN: user.given_name || "",
-        senderLN: user.family_name || "",
-        senderId: user.id || "",
-        like: 0,
-        heart: 0,
-        eyes: 0,
-        dislike: 0,
-      },
-      ...prev,
-    ]);
+    // setMessages((prev) => [
+    //   {
+    //     id,
+    //     content: message,
+    //     date: new Date().toISOString(),
+    //     senderFN: user.given_name || "",
+    //     senderLN: user.family_name || "",
+    //     senderId: user.id || "",
+    //     like: 0,
+    //     heart: 0,
+    //     eyes: 0,
+    //     dislike: 0,
+    //   },
+    //   ...prev,
+    // ]);
+    channel.publish("new-message", {
+      id,
+      content: message,
+      date: new Date().toISOString(),
+      senderFN: user.given_name || "",
+      senderLN: user.family_name || "",
+      senderId: user.id || "",
+      like: 0,
+      heart: 0,
+      eyes: 0,
+      dislike: 0,
+    });
     setMessage("");
   };
   return (
@@ -82,6 +102,7 @@ const Messages = ({ messages, projectId, setMessages, user }: Props) => {
         value={message}
         onChange={onMessageChange}
         onClick={onMessageSend}
+        isShown={undefined}
       />
     </div>
   );

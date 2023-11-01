@@ -69,30 +69,36 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
 
   const { channel } = useChannel(`task-added:${projectId}`, (event: any) => {
     // channel that updates the task manager in real time for every user
-    console.log(event.data);
-    setTasks((prev) => (prev ? [...prev, event.data] : prev));
-    const id = v4();
-    const content = `A new task was added to the ${event.data.category} manager.`;
-    addMessage.mutate({
-      message: { id, content },
-      projectId,
-      senderId: user.id!,
-    });
-    setMessages((prev) => [
-      {
-        id,
-        content,
-        date: new Date().toISOString(),
-        senderFN: user.given_name || "",
-        senderLN: user.family_name || "",
-        senderId: user.id || "",
-        like: 0,
-        heart: 0,
-        eyes: 0,
-        dislike: 0,
-      },
-      ...prev,
-    ]);
+    console.log(event);
+    if (event.name === "new-message") {
+      setMessages((prev) => [event.data, ...prev]);
+    } else if (event.name === "delete-task") {
+      setTasks((prev) => prev?.filter((t) => t.id !== event.data.id));
+    } else {
+      setTasks((prev) => (prev ? [...prev, event.data] : prev));
+      const id = v4();
+      const content = `A new task was added to the ${event.data.category} manager.`;
+      addMessage.mutate({
+        message: { id, content },
+        projectId,
+        senderId: user.id!,
+      });
+      setMessages((prev) => [
+        {
+          id,
+          content,
+          date: new Date().toISOString(),
+          senderFN: user.given_name || "",
+          senderLN: user.family_name || "",
+          senderId: user.id || "",
+          like: 0,
+          heart: 0,
+          eyes: 0,
+          dislike: 0,
+        },
+        ...prev,
+      ]);
+    }
   });
 
   const { data, isLoading } = trpc.getProject.useQuery({
@@ -103,20 +109,41 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
     setTasks(data?.project.Tasks);
   }, [data]);
   const addTask = trpc.addTask.useMutation();
+  const deleteTask = trpc.deleteTask.useMutation();
+
+  const handleDeleteTask = (id: number | undefined) => {
+    if (id) {
+      deleteTask.mutate({ id });
+    }
+
+    channel.publish("delete-task", { id });
+  };
   const todoTasks =
     tasks &&
     tasks.map((task) =>
-      task.category == "Todo" ? <TaskCardB task={task} /> : <></>
+      task.category == "Todo" ? (
+        <TaskCardB task={task} handleDeleteTask={handleDeleteTask} />
+      ) : (
+        <></>
+      )
     );
   const doingTasks =
     tasks &&
     tasks.map((task) =>
-      task.category == "Doing" ? <TaskCardB task={task} /> : <></>
+      task.category == "Doing" ? (
+        <TaskCardB task={task} handleDeleteTask={handleDeleteTask} />
+      ) : (
+        <></>
+      )
     );
   const doneTasks =
     tasks &&
     tasks.map((task) =>
-      task.category == "Done" ? <TaskCardB task={task} /> : <></>
+      task.category == "Done" ? (
+        <TaskCardB task={task} handleDeleteTask={handleDeleteTask} />
+      ) : (
+        <></>
+      )
     );
 
   const handleNewTask = () => {
@@ -225,6 +252,7 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
                   messages={messages}
                   setMessages={setMessages}
                   user={user}
+                  channel={channel}
                 />
               }
             />

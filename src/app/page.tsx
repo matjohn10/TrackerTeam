@@ -53,11 +53,11 @@ export default function Home() {
         <div className="absolute top-0 left-0 w-full bg-gray-200 border border-gray-300 opacity-60 rounded-lg -z-10 h-full" />
         <div>
           <Image
-            className="rounded-lg"
-            src="/placeholder.jpeg"
+            className="rounded-lg border-2 border-[#ff54164a]"
+            src="/Dashboard.png"
             alt="website-image"
-            width={1200}
-            height={800}
+            width={1805}
+            height={1052}
           />
         </div>
       </div>

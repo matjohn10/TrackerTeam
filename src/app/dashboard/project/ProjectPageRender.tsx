@@ -15,7 +15,7 @@ const ProjectPageRender = ({ user }: { user: KindeUser }) => {
 
   return (
     <div className="flex relative gap-2 h-[calc(100vh-89px)] w-full">
-      <div className="absolute -top-[3.25rem] left-8 flex justify-center items-center z-30">
+      <div className="absolute -top-[3.25rem] left-20 md:left-8 flex justify-center items-center z-30">
         <AlignJustify
           className="font-semibold hover:cursor-pointer"
           onClick={() => setIsOpen((prev) => !prev)}

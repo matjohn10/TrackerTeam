@@ -204,6 +204,16 @@ export const appRouter = router({
         },
       });
     }),
+  deleteTask: privateProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const { id } = input;
+      await db.task.delete({
+        where: {
+          id,
+        },
+      });
+    }),
   getMessages: privateProcedure
     .input(z.object({ projectId: z.string() }))
     .query(async ({ input }) => {

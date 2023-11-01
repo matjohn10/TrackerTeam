@@ -47,7 +47,7 @@ export function InputWithButton({
           variant="ghost"
           onClick={() => {
             onClick();
-            !isShown
+            isShown !== undefined && !isShown
               ? toast({
                   variant: "destructive",
                   title: "Important!!",

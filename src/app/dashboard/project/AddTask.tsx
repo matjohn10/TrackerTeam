@@ -64,7 +64,7 @@ const AddTask = ({ setTasks, category, projectId, channel }: Props) => {
 
   const trigger = (
     <div className="flex w-full justify-center">
-      <div className="flex items-center justify-start w-6/12 gap-2 pl-2 mt-2 rounded-md hover:bg-gray-200 hover:cursor-pointer">
+      <div className="flex items-center justify-center min-w-[110px] w-6/12 gap-2 pl-2 mt-2 rounded-md hover:bg-gray-200 hover:cursor-pointer">
         <PlusCircle className="w-4 h-4" />
         <p>Add Task</p>
       </div>
