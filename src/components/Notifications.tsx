@@ -34,9 +34,13 @@ const Notifications = ({ user }: Props) => {
   const {} = useChannel("connected", (event: any) => {
     if (event.data.emails.includes(user.email)) {
       // make a notification maybe in the header since it is always on the screen
+
       addNotif.mutate({ message: event.data.message });
       setNotifications((prev) => [...prev, { message: event.data.message }]);
     }
+    // channel.history((err: any, resultPage: any) => {
+    //   console.log(resultPage);
+    // });
   });
 
   const handleClick = () => {
@@ -65,7 +69,7 @@ const Notifications = ({ user }: Props) => {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col w-full gap-2 itemx-center">
-          {notifs}
+          {notifications.length === 0 ? <p>No notifications.</p> : notifs}
           <Button variant="destructive" size="sm" onClick={handleClick}>
             Clear
           </Button>

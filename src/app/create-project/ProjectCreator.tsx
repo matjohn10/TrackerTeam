@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProjectForm from "./ProjectForm";
 import TaskForm from "./TaskForm";
 import { Button } from "@/components/ui/button";
@@ -35,8 +35,8 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
     return count;
   };
   const checkTaskInputs = !(counter() == 3 || counter() == 0);
-
-  const handleProjectCreation = async () => {
+  const [render, setRender] = useState(false);
+  const handleProjectCreation = () => {
     // create an id
     // sent project info to db using trpc
     const id = v4();
@@ -49,20 +49,28 @@ const ProjectCreator = ({ user }: { user: KindeUser }) => {
       task = { title, description, category };
     }
 
-    await mutation.mutate({ project, task });
+    mutation.mutate({ project, task });
     addMembers.mutate({ emails, projectId: id });
+    setRender(true);
   };
+
   if (mutation.isSuccess) {
-    channel.publish("send-project", {
-      emails,
-      message: `You were added to a new project called ${name}.`,
-    });
+    // setRenderCount((prev) => prev++);
     redirect(api.baseURL + "/dashboard/project?id=" + projectId);
   }
   if (mutation.isError) {
     // create a popup to mention error and to try again
     console.log(mutation.error);
   }
+  useEffect(() => {
+    console.log("here");
+
+    channel.publish("send-project", {
+      emails,
+      message: `You were added to a new project called ${name}.`,
+      senderEmail: user.email,
+    });
+  }, [render]);
 
   return (
     <div className="flex flex-col items-center gap-2 w-full animate-appear">

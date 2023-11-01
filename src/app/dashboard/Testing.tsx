@@ -1,25 +1,23 @@
 "use client";
 
 import { useChannel } from "ably/react";
-import { useState } from "react";
+
+import { trpc } from "../_trpc/client";
 
 const Testing = () => {
-  const [test, setTest] = useState<string[]>([]);
-  const { channel } = useChannel("test", (event: any) => {
-    console.log(event);
-    setTest((prev) => [...prev, event.data]);
-  });
-  const testdiv = test.map((item) => <p>{item}</p>);
+  // const [test, setTest] = useState<string[]>([]);
+  const { channel } = useChannel("connected");
+  const mutate = trpc.test.useMutation();
+  // const testdiv = test.map((item) => <p>{item}</p>);
   return (
     <div>
       <button
         onClick={() => {
-          channel.publish("testing", "abc");
+          mutate.mutate({ userId: "kp_a583c652a4d0476b9338c1f7eb9377bc" });
         }}
       >
         Press
       </button>
-      <div className="flex gap-2">{testdiv}</div>
     </div>
   );
 };

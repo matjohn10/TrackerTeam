@@ -237,6 +237,7 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
       <div className="flex flex-col w-full">
         <div className="flex justify-between items-center w-full">
           <h2 className="font-bold text-3xl">{data?.project.name}</h2>
+
           <div className="flex items-center gap-4 w-fit">
             <CustomDialog
               child={
@@ -298,7 +299,7 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
       </div>
       <div className="flex flex-col xl:flex-row xl:justify-between px-[12rem] py-6 w-full gap-4">
         <div className="flex flex-col w-full items-center" key="Todo">
-          <h3 className="text-xl font-semibold mb-4">Todo</h3>
+          <h3 className="text-xl font-semibold mb-4">Upcoming</h3>
           {isLoading ? (
             <Skeleton className="w-full h-16" />
           ) : (
@@ -330,7 +331,7 @@ const TaskDashboard = ({ projectId, isOpen, user }: Props) => {
           />
         </div>
         <div className="flex flex-col w-full items-center" key="Done">
-          <h3 className="text-xl font-semibold mb-4">Done</h3>
+          <h3 className="text-xl font-semibold mb-4">Completed</h3>
           {isLoading ? (
             <Skeleton className="w-full h-16" />
           ) : (

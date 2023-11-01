@@ -41,7 +41,7 @@ export function ComboboxPopover({
   const [open, setOpen] = React.useState(false);
   const [selectedStatus, setSelectedStatus] =
     React.useState<ComboboxElement | null>(null);
-
+  console.log(selectedStatus);
   return (
     <div className="flex items-center space-x-4">
       <p className="text-sm text-muted-foreground">{name}</p>
@@ -55,7 +55,7 @@ export function ComboboxPopover({
             {selectedStatus ? (
               <>
                 <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
-                {selectedStatus.label}
+                {selectedStatus.value}
               </>
             ) : (
               <>{placeholder}</>
@@ -74,14 +74,15 @@ export function ComboboxPopover({
                   <CommandItem
                     key={status.value}
                     onSelect={(value) => {
+                      console.log(value);
                       setSelectedStatus(
                         comboboxElements.find(
-                          (priority) => priority.value === value
+                          (priority) => priority.value.toLowerCase() === value
                         ) || null
                       );
                       setSelectedElement(
                         comboboxElements.find(
-                          (priority) => priority.value === value
+                          (priority) => priority.value.toLowerCase() === value
                         )?.label || ""
                       );
                       setOpen(false);
@@ -95,7 +96,7 @@ export function ComboboxPopover({
                           : "opacity-40"
                       )}
                     />
-                    <span>{status.label}</span>
+                    <span>{status.value}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>

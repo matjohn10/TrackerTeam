@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChannel } from "ably/react";
+import { useEffect, useState } from "react";
 
 interface Props {
   user: KindeUser;
 }
 
-type Project = {
+export type Project = {
   userId: string;
   projectId: string;
   project: {
@@ -40,13 +41,34 @@ type Project = {
 };
 
 const Projects = ({ user }: Props) => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const { channel } = useChannel("projects", (event: any) => {
+    console.log(event);
+    if (
+      event.name === "delete-all" &&
+      projects.find((p) => p.projectId === event.data.id)
+    ) {
+      setProjects((prev) => prev.filter((p) => p.projectId !== event.data.id));
+    }
+  });
+
   const { data, isLoading } = trpc.getProjects.useQuery();
 
+  useEffect(() => {
+    data && setProjects(data);
+  }, [data]);
+
   const displayProjects = () => {
-    return data && data.length !== 0 ? (
+    return projects && projects.length !== 0 ? (
       <>
-        {data.map((work) => (
-          <ProjectCard project={work.project} tasks={work.project.Tasks} />
+        {projects.map((work) => (
+          <ProjectCard
+            project={work.project}
+            tasks={work.project.Tasks}
+            user={user}
+            setProjects={setProjects}
+            channel={channel}
+          />
         ))}
       </>
     ) : isLoading ? (

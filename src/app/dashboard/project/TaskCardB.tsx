@@ -65,7 +65,7 @@ const TaskCardB = ({ task, handleDeleteTask, handleMovetask }: Props) => {
                     size="sm"
                     onClick={() => handleMovetask(task.id, "Done", task)}
                   >
-                    Move to Done
+                    Move to Completed
                   </Button>
                   <Button
                     variant="ghost"
@@ -82,14 +82,14 @@ const TaskCardB = ({ task, handleDeleteTask, handleMovetask }: Props) => {
                     size="sm"
                     onClick={() => handleMovetask(task.id, "Todo", task)}
                   >
-                    Mode to Todo
+                    Mode to Upcoming
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleMovetask(task.id, "Done", task)}
                   >
-                    Move to Done
+                    Move to Completed
                   </Button>
                   <Button
                     variant="ghost"
@@ -106,7 +106,7 @@ const TaskCardB = ({ task, handleDeleteTask, handleMovetask }: Props) => {
                     size="sm"
                     onClick={() => handleMovetask(task.id, "Todo", task)}
                   >
-                    Mode to Todo
+                    Mode to Upcoming
                   </Button>
                   <Button
                     variant="ghost"

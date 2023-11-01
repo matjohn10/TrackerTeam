@@ -65,6 +65,16 @@ export const appRouter = router({
 
     return projects;
   }),
+  test: privateProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { userId } = input;
+      await db.worksOn.deleteMany({
+        where: {
+          userId,
+        },
+      });
+    }),
   getProject: privateProcedure
     .input(z.object({ projectId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -133,6 +143,33 @@ export const appRouter = router({
           },
         });
       }
+    }),
+  deleteProjectForAll: privateProcedure
+    .input(z.object({ projectId: z.string() }))
+    .mutation(async ({ input }) => {
+      const { projectId } = input;
+      await db.worksOn.deleteMany({
+        where: {
+          projectId,
+        },
+      });
+      await db.project.delete({
+        where: {
+          id: projectId,
+        },
+      });
+    }),
+  deleteProjectForOne: privateProcedure
+    .input(z.object({ projectId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const { projectId } = input;
+      await db.worksOn.deleteMany({
+        where: {
+          projectId,
+          userId,
+        },
+      });
     }),
   getMembers: privateProcedure
     .input(z.object({ ids: z.array(z.string()), projectId: z.string() }))

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookOpenCheck } from "lucide-react";
 import Image from "next/image";
+import Testing from "./dashboard/Testing";
 
 export default function Home() {
   return (
@@ -31,6 +32,7 @@ export default function Home() {
           </Link>
         </Button>
       </div>
+
       <div className="flex flex-col p-10 text-center text-lg mt-10">
         <p>Plan with your team and we deliver</p>{" "}
         <p>
